@@ -62,6 +62,9 @@ docker compose up -d --build
 ```bash
 docker compose exec php composer install
 ```
+4) Bring back commented lines and remove extra ones (if we want to deploy it for ex. on https://fly.io/, Redis is payed instance, in this case we use for free developing locally)
+
+![img.png](img.png)
 
 4) UI dev server (runs automatically via the `node` service):
 - Open: **http://localhost:5173/**

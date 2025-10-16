@@ -1,0 +1,41 @@
+app = "currency-exchange-service"
+primary_region = "ams"
+
+[build]
+dockerfile = "Dockerfile"
+
+[env]
+APP_ENV = "prod"
+APP_DEBUG = "0"
+APP_SECRET = "ChangeThisSecret"
+
+SWOP_API_BASE = "https://swop.cx/rest"
+SWOP_API_KEY = "replace-with-your-key"
+
+# REDIS_DSN = ""
+
+RATES_TTL_SECONDS = "3600"
+
+# Disable Influx in prod unless you really need it
+INFLUX_URL = ""
+INFLUX_TOKEN = ""
+INFLUX_ORG = ""
+INFLUX_BUCKET = ""
+
+# Web service listens on port 80 in the container
+[[services]]
+protocol = "tcp"
+internal_port = 80
+
+[[services.ports]]
+port = 80
+handlers = ["http"]
+
+[[services.ports]]
+port = 443
+handlers = ["tls", "http"]
+
+[services.concurrency]
+type = "connections"
+soft_limit = 50
+hard_limit = 100

@@ -1,0 +1,13 @@
+.git
+.github
+cookies.txt
+node_modules
+frontend/node_modules
+frontend/dist
+backend/var
+backend/vendor
+docker/*/data
+influxdb
+grafana
+**/*.log
+**/.DS_Store
