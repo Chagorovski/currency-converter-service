@@ -1,0 +1,122 @@
+# ==========================
+# GENERAL
+# ==========================
+.DS_Store
+Thumbs.db
+*.log
+*.lock
+*.tmp
+*.swp
+*.swo
+*.bak
+*.old
+*.orig
+
+# Ignore system & editor files
+.idea/
+.vscode/
+*.iml
+
+# Ignore environment configuration
+.env
+.env.local
+.env.*.local
+.envrc
+
+# Ignore node and vendor cache dirs
+node_modules/
+vendor/
+
+# Ignore build outputs
+dist/
+build/
+public/app/
+public/build/
+frontend/dist/
+backend/public/app/
+coverage/
+reports/
+
+# ==========================
+# DOCKER
+# ==========================
+# Ignore runtime volumes and generated data
+docker/data/
+docker/logs/
+docker-compose.override.yml
+*.pid
+
+# InfluxDB & Grafana data volumes
+influxdb/
+grafana/
+
+# Redis data volume
+redis-data/
+
+# Ignore PHP container cache (sessions, etc.)
+backend/var/cache/
+backend/var/log/
+backend/var/sessions/
+
+# ==========================
+# PHP / SYMFONY
+# ==========================
+# Symfony cache, logs, sessions
+/var/cache/
+/var/log/
+/var/sessions/
+/var/test/
+/vendor/
+/composer.lock
+
+# PHPUnit
+/phpunit.xml
+/phpunit.xml.dist
+/.phpunit.result.cache
+
+# Ignore Symfony binary local server files
+.symfony/
+.phpunit.result.cache
+.php_cs.cache
+.php-cs-fixer.cache
+
+# ==========================
+# VUE / VITE FRONTEND
+# ==========================
+# Node & build
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.vite/deps/
+/frontend/.cache/
+/frontend/.eslintcache
+/frontend/.env
+/frontend/.env.local
+/frontend/.env.*.local
+
+# ==========================
+# TESTS & TEMP FILES
+# ==========================
+tmp/
+.cache/
+.nyc_output/
+
+# ==========================
+# MISC
+# ==========================
+# Local Docker images & backups
+*.tar
+*.zip
+*.sql
+*.gz
+*.dump
+
+# ==========================
+# ✅ KEEP THESE (important)
+# ==========================
+!backend/composer.json
+!frontend/package.json
+!frontend/vite.config.js
+!docker-compose.yml
+!docker/
+!nginx.conf
+!README.md

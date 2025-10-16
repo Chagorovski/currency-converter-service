@@ -1,0 +1,30 @@
+
+session_get:
+  path: /api/session
+  controller: App\Controller\SessionController::getSession
+  methods: [GET]
+
+session_login:
+  path: /api/session/login
+  controller: App\Controller\SessionController::login
+  methods: [POST]
+
+session_logout:
+  path: /api/session/logout
+  controller: App\Controller\SessionController::logout
+  methods: [POST]
+
+csrf_get:
+  path: /api/csrf
+  controller: App\Controller\SessionController::getCsrfToken
+  methods: [GET]
+
+convert_get:
+  path: /api/convert
+  controller: App\Controller\ConversionController::getConvert
+  methods: [GET]
+
+convert_post:
+  path: /api/convert
+  controller: App\Controller\ConversionController::postConvert
+  methods: [POST]

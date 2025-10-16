@@ -1,0 +1,25 @@
+framework:
+  secret: '%env(APP_SECRET)%'
+  http_method_override: false
+
+  router:
+    utf8: true
+
+  csrf_protection: true
+
+  http_client:
+    default_options:
+      timeout: 3.0
+
+  validation:
+    enable_attributes: true
+
+  cache:
+    app: cache.adapter.redis
+    default_redis_provider: '%env(REDIS_DSN)%'
+
+  session:
+    handler_id: '%env(REDIS_DSN)%'
+    cookie_secure: auto
+    cookie_samesite: lax
+    cookie_httponly: true

@@ -1,0 +1,74 @@
+name: CI (Docker)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      # back-end env (use repo/Org secrets for real tokens)
+      APP_ENV: test
+      APP_DEBUG: 0
+      APP_SECRET: test-secret
+
+      SWOP_API_BASE: https://swop.cx/rest
+      SWOP_API_KEY: ${{ secrets.SWOP_API_KEY || 'dummy-key' }}
+
+      REDIS_DSN: redis://redis:6379
+      RATES_TTL_SECONDS: 3600
+
+      INFLUX_URL: http://influxdb:8086
+      INFLUX_TOKEN: dummy-token
+      INFLUX_ORG: ci-org
+      INFLUX_BUCKET: currency_metrics
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers (optional but faster)
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build images
+        run: |
+          docker compose build
+
+      - name: Start services
+        run: |
+          docker compose up -d redis php node
+
+      - name: Install Composer deps (inside php container)
+        run: |
+          docker compose exec -T -w /var/www/html php composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install & build frontend (inside node container)
+        run: |
+          docker compose exec -T node sh -lc "npm ci && npm run build"
+
+      - name: Run PHPUnit (inside php container)
+        run: |
+          docker compose exec -T -w /var/www/html php ./vendor/bin/phpunit --testsuite default
+
+      - name: Show php logs on failure
+        if: failure()
+        run: |
+          docker compose logs php || true
+          docker compose logs node || true
+          docker compose logs redis || true
+
+      - name: Tear down
+        if: always()
+        run: |
+          docker compose down -v
