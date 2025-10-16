@@ -23,6 +23,8 @@ Thumbs.db
 .env.*.local
 .envrc
 
+!backend/composer.lock
+
 # Ignore node and vendor cache dirs
 node_modules/
 vendor/
