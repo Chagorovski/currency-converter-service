@@ -46,9 +46,14 @@ docker/logs/
 docker-compose.override.yml
 *.pid
 
-# InfluxDB & Grafana data volumes
-influxdb/
-grafana/
+# Influx & Grafana: ignore local data, keep provisioning config
+/docker/influxdb/data/
+/docker/grafana/data/
+
+# Keep Grafana provisioning files
+!docker/grafana/
+!docker/grafana/provisioning/
+!docker/grafana/provisioning/**
 
 # Redis data volume
 redis-data/

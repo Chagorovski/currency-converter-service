@@ -1,0 +1,14 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "panels": [{
+    "type": "timeseries",
+    "title": "Conversion Requests",
+    "targets": [{
+      "query": "from(bucket: \"currency_metrics\") |> range(start: -6h) |> filter(fn: (r) => r._measurement == \"requests\" and r._field == \"duration_ms\") |> aggregateWindow(every: 1m, fn: mean)"
+    }],
+    "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 }
+  }],
+  "schemaVersion": 38,
+  "title": "Currency Service"
+}
