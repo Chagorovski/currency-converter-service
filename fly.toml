@@ -1,4 +1,4 @@
-app = "currency-exchange-service"
+app = "currency-converter-service"
 primary_region = "ams"
 
 [build]
