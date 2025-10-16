@@ -10,9 +10,6 @@ APP_DEBUG = "0"
 APP_SECRET = "ChangeThisSecret"
 
 SWOP_API_BASE = "https://swop.cx/rest"
-SWOP_API_KEY = "replace-with-your-key"
-
-# REDIS_DSN = ""
 
 RATES_TTL_SECONDS = "3600"
 
