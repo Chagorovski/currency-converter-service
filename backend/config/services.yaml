@@ -29,7 +29,7 @@ services:
   App\Service\SwopExchangeRateProvider:
     arguments:
       $clientApi: '@App\Service\ExchangeRateClientInterface'
-      $cache: '@app.redis_adapter'
+      $cache: '@cache.app'
       $ttlSeconds: '%env(int:RATES_TTL_SECONDS)%'
 
   App\Service\ConversionService:
@@ -47,4 +47,4 @@ services:
     arguments:
       $baseUrl: '%env(SWOP_API_BASE)%'
       $apiKey: '%env(SWOP_API_KEY)%'
-      $timeoutSeconds: 3.0
+      $timeoutSeconds: 5.0
