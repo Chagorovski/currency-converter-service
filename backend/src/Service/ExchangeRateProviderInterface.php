@@ -5,5 +5,5 @@ namespace App\Service;
 
 interface ExchangeRateProviderInterface
 {
-    public function getEurToQuote(string $currencyCode): float;
+    public function fetchExchangeRateCurrency(string $currencyCode): float;
 }

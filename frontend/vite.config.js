@@ -1,15 +1,18 @@
-// frontend/vite.config.js
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-export default ({ command, mode }) => {
+export default ({ command }) => {
   const isBuild = command === 'build'
+
+  const inDocker = fs.existsSync('/.dockerenv')
+
+  const apiTarget =
+      env.VITE_API_ORIGIN ||
+      (inDocker ? 'http://nginx' : 'http://localhost:8080')
 
   return defineConfig({
     base: isBuild ? '/app/' : '/',
-
     plugins: [vue()],
-
     server: {
       host: true,
       port: 5173,
@@ -18,13 +21,13 @@ export default ({ command, mode }) => {
       hmr: { clientPort: 5173 },
       proxy: {
         '/api': {
-          target: 'http://nginx',
+          target: apiTarget,
           changeOrigin: true,
           secure: false,
+          cookieDomainRewrite: 'localhost',
         },
       },
     },
-
     build: {
       outDir: 'dist',
       emptyOutDir: true,

@@ -1,4 +1,3 @@
-// frontend/src/services/apiClient.js
 import { ApiError } from '../errors/ApiError'
 import { NetworkError } from '../errors/NetworkError'
 import { ValidationError } from '../errors/ValidationError'
@@ -20,7 +19,7 @@ async function request(path, { method = 'GET', headers = {}, body, timeout = 600
     try {
         const res = await fetch(url, {
             method,
-            credentials: 'include', // carry session cookies
+            credentials: 'include',
             headers: {
                 'Accept': 'application/json',
                 ...(body ? { 'Content-Type': 'application/json' } : {}),
@@ -62,12 +61,6 @@ export async function convertGet({ amount, from, to }) {
     return request(q)
 }
 
-/**
- * POST /api/convert with CSRF protection.
- * If csrfToken is omitted, it will be fetched automatically.
- * @param {{amount:number, from:string, to:string}} payload
- * @param {string=} csrfToken
- */
 export async function convertPost(payload, csrfToken) {
     const token = csrfToken || await fetchCsrfToken()
     return request('/api/convert', {

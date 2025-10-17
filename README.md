@@ -62,13 +62,14 @@ docker compose up -d --build
 ```bash
 docker compose exec php composer install
 ```
-4) Bring back commented lines and remove extra ones (if we want to deploy it for ex. on https://fly.io/, Redis is payed instance, in this case we use for free developing locally)
+4) Bring back commented lines and remove extra ones in **framework.yaml** (if we want to deploy it for ex. on https://fly.io/, Redis is payed instance, in this case we use for free developing locally)
 
 ![img.png](img.png)
 
 5) If running the app locally please use the following nginx.conf
 
-```worker_processes  auto;
+```
+worker_processes  auto;
 
 events { worker_connections 1024; }
 

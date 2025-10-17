@@ -3,7 +3,7 @@ namespace App\Service;
 
 use Throwable;
 
-final class MetricsClient
+class MetricsClient
 {
     public function __construct(
         private string $url,
@@ -19,20 +19,22 @@ final class MetricsClient
         }
 
         if (empty($fields)) {
-            return; // nothing to write
+            return;
         }
 
         $tagStr = '';
-        foreach ($tags as $k => $v) {
-            $tagStr .= ',' . preg_replace('/[ ,]/', '_', (string)$k) . '=' . preg_replace('/[ ,]/', '_', (string)$v);
+        foreach ($tags as $key => $value) {
+            $tagStr .= ','
+                . preg_replace('/[ ,]/', '_', (string)$key) . '='
+                . preg_replace('/[ ,]/', '_', (string)$value);
         }
 
         $fieldParts = [];
-        foreach ($fields as $k => $v) {
+        foreach ($fields as $key => $value) {
             $fieldParts[] =
-                is_numeric($v) ?
-                    ($k . '=' . (is_int($v) ? $v : (float)$v)) :
-                    ($k . '="' . str_replace('"', '\"', (string)$v) . '"');
+                is_numeric($value) ?
+                    ($key . '=' . (is_int($value) ? $value : (float)$value)) :
+                    ($key . '="' . str_replace('"', '\"', (string)$value) . '"');
         }
 
         if (!$fieldParts) {
@@ -42,8 +44,8 @@ final class MetricsClient
         $body = $measurement . $tagStr . ' ' . implode(',', $fieldParts);
 
         try {
-            $ch = curl_init();
-            curl_setopt_array($ch, [
+            $curlSession = curl_init();
+            curl_setopt_array($curlSession, [
                 CURLOPT_URL => rtrim($this->url, '/') . '/api/v2/write?org=' . rawurlencode($this->org)
                     . '&bucket=' . rawurlencode($this->bucket) . '&precision=ms',
                 CURLOPT_RETURNTRANSFER => true,
@@ -55,8 +57,8 @@ final class MetricsClient
                 ],
                 CURLOPT_TIMEOUT => 1,
             ]);
-            curl_exec($ch);
-            curl_close($ch);
+            curl_exec($curlSession);
+            curl_close($curlSession);
         } catch (Throwable) { /* fire-and-forget */ }
     }
 }

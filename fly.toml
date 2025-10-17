@@ -13,13 +13,11 @@ SWOP_API_BASE = "https://swop.cx/rest"
 
 RATES_TTL_SECONDS = "3600"
 
-# Disable Influx in prod unless you really need it
 INFLUX_URL = ""
 INFLUX_TOKEN = ""
 INFLUX_ORG = ""
 INFLUX_BUCKET = ""
 
-# Web service listens on port 80 in the container
 [[services]]
 protocol = "tcp"
 internal_port = 80

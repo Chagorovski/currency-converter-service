@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # back-end env (use repo/Org secrets for real tokens)
       APP_ENV: test
       APP_DEBUG: 0
       APP_SECRET: test-secret

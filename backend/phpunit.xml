@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
-        bootstrap="vendor/autoload.php"
+        bootstrap="tests/bootstrap.php"
         colors="true"
         failOnWarning="true"
         failOnRisky="true"
@@ -17,8 +17,12 @@
     <php>
         <env name="APP_ENV" value="test"/>
         <env name="APP_DEBUG" value="1"/>
-        <env name="REDIS_DSN" value="redis://redis:6379"/>
+        <env name="KERNEL_CLASS" value="App\Kernel"/>
+        <env name="APP_SECRET" value="test-secret"/>
+        <env name="REDIS_DSN" value=""/>
+        <env name="MESSENGER_TRANSPORT_DSN" value="in-memory://"/>
         <env name="SWOP_API_BASE" value="https://swop.cx/rest"/>
         <env name="SWOP_API_KEY" value="dummy"/>
+        <env name="SYMFONY_PHPUNIT_VERSION" value="10.5"/>
     </php>
 </phpunit>

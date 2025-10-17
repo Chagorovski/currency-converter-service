@@ -3,7 +3,6 @@ services:
     autowire: true
     autoconfigure: true
 
-  # Register ALL non-controller classes under src/ as services
   App\:
     resource: '../src/'
     exclude:
@@ -12,43 +11,50 @@ services:
       - '../src/Kernel.php'
       - '../src/Tests/'
 
-  # Controllers stay public and tagged
   App\Controller\:
     resource: '../src/Controller/'
     tags: ['controller.service_arguments']
     public: true
 
-  # --- Redis connection (factory needs a concrete class) ---
   cache.redis_connection:
     class: Redis
     factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
     arguments:
       - '%env(REDIS_DSN)%'
 
-  # --- Redis adapter using that connection ---
   app.redis_adapter:
     class: Symfony\Component\Cache\Adapter\RedisAdapter
     arguments:
-      - '@cache.redis_connection' # connection
-      - 'app'                     # namespace
-      - 0                         # default lifetime
+      - '@cache.redis_connection'
+      - 'app'
+      - 0
 
-  # --- Metrics client (Influx) ---
   App\Service\MetricsClient:
     arguments:
-      $url:    '%env(INFLUX_URL)%'
-      $token:  '%env(INFLUX_TOKEN)%'
-      $org:    '%env(INFLUX_ORG)%'
+      $url: '%env(INFLUX_URL)%'
+      $token: '%env(INFLUX_TOKEN)%'
+      $org: '%env(INFLUX_ORG)%'
       $bucket: '%env(INFLUX_BUCKET)%'
 
-  # --- Swop provider implementation ---
   App\Service\SwopExchangeRateProvider:
     arguments:
-      $http:       '@http_client'
-      $baseUrl:    '%env(SWOP_API_BASE)%'
-      $apiKey:     '%env(SWOP_API_KEY)%'
-      $cache:      '@app.redis_adapter'
+      $clientApi: '@App\Service\ExchangeRateClientInterface'
+      $cache: '@app.redis_adapter'
       $ttlSeconds: '%env(int:RATES_TTL_SECONDS)%'
 
-  # --- Bind interface -> implementation ---
+  App\Service\ConversionService:
+    arguments:
+      $rates: '@App\Service\ExchangeRateProviderInterface'
+      $calculator: '@App\Service\MoneyConversionCalculator'
+      $metrics: '@App\Service\MetricsClient'
+      $validator: '@validator'
+
   App\Service\ExchangeRateProviderInterface: '@App\Service\SwopExchangeRateProvider'
+
+  App\Service\ExchangeRateClientInterface: '@App\Service\SwopApiClient'
+
+  App\Service\SwopApiClient:
+    arguments:
+      $baseUrl: '%env(SWOP_API_BASE)%'
+      $apiKey: '%env(SWOP_API_KEY)%'
+      $timeoutSeconds: 3.0

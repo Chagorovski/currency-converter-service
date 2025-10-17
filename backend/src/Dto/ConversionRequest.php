@@ -1,9 +1,10 @@
 <?php
-namespace App\DTO;
+
+namespace App\Dto;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class ConversionRequest
+final class ConversionRequest
 {
     #[Assert\NotBlank]
     #[Assert\PositiveOrZero]
