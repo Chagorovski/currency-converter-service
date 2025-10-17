@@ -1,7 +1,9 @@
-import { defineConfig } from 'vite'
+import {defineConfig, loadEnv} from 'vite'
 import vue from '@vitejs/plugin-vue'
+import fs from 'node:fs'
 
-export default ({ command }) => {
+export default ({ command, mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
   const isBuild = command === 'build'
 
   const inDocker = fs.existsSync('/.dockerenv')
