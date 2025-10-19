@@ -48,7 +48,7 @@ docker-compose
 
 1) Clone & configure:
 ```bash
-git clone <repo-url>
+git clone https://github.com/Chagorovski/currency-converter-service.git
 cd currency-converter-service
 cp .env.example .env
 ```

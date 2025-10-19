@@ -10,10 +10,13 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final class SwopExchangeRateProvider implements ExchangeRateProviderInterface
 {
+
+    private const DEFAULT_TTL = 3600;
+
     public function __construct(
         private ExchangeRateClientInterface $clientApi,
         private CacheInterface $cache,
-        private int $ttlSeconds = 3600,
+        private int $ttlSeconds = self::DEFAULT_TTL,
     ) {}
 
     public function fetchExchangeRateCurrency(string $currencyCode): float
