@@ -62,11 +62,8 @@ docker compose up -d --build
 ```bash
 docker compose exec php composer install
 ```
-4) Bring back commented lines and remove extra ones in **framework.yaml** (if we want to deploy it for ex. on https://fly.io/, Redis is payed instance, in this case we use for free developing locally)
 
-![img.png](img.png)
-
-5) If running the app locally please use the following nginx.conf
+4) If running the app locally please use the following nginx.conf
 
 ```
 worker_processes  auto;
@@ -147,10 +144,10 @@ http {
 docker compose restart nginx
 ```
 
-6) UI dev server (runs automatically via the `node` service):
+5) UI dev server (runs automatically via the `node` service):
 - Open: **http://localhost:5173/**
 
-7) Useful UIs:
+6) Useful UIs:
 - **Grafana** → http://localhost:3001  (admin / admin)
 - **InfluxDB** → http://localhost:8086  (admin / adminadmin)
 
