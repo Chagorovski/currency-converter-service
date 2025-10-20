@@ -16,7 +16,7 @@ framework:
 
   cache:
     app: cache.adapter.redis
-    default_redis_provider: '%env(REDIS_DSN)%'
+    default_redis_provider: '%env(REDIS_URL)%'
 
   session:
     handler_id: null

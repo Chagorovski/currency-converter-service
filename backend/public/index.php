@@ -7,6 +7,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
+if ($redisUrl = getenv('REDIS_URL')) {
+    ini_set('session.save_handler', 'redis');
+    ini_set('session.save_path', $redisUrl);
+}
+
 if ($_SERVER['APP_DEBUG'] ?? true) {
     umask(0000);
     Debug::enable();
