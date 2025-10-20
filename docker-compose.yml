@@ -19,7 +19,7 @@ services:
       APP_SECRET: ${APP_SECRET:-ChangeThisSecret}
       SWOP_API_BASE: ${SWOP_API_BASE}
       SWOP_API_KEY: ${SWOP_API_KEY}
-      REDIS_DSN: ${REDIS_DSN:-redis://redis:6379}
+      REDIS_DSN: ${REDIS_URL:-redis://redis:6379}
       RATES_TTL_SECONDS: ${RATES_TTL_SECONDS:-3600}
       INFLUX_URL: ${INFLUX_URL}
       INFLUX_TOKEN: ${INFLUX_TOKEN}
@@ -46,9 +46,15 @@ services:
 
   redis:
     image: redis:7-alpine
+    command: [ "redis-server", "--appendonly", "yes" ]
     ports:
       - "6379:6379"
-    networks: [appnet]
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [ appnet ]
 
   influxdb:
     image: influxdb:2.7

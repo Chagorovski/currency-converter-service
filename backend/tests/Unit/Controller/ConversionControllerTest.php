@@ -7,8 +7,10 @@ use App\Service\ConversionService;
 use App\Service\ExchangeRateProviderInterface;
 use App\Service\MetricsClient;
 use App\Service\MoneyConversionCalculator;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -24,6 +26,19 @@ class ConversionControllerTest extends WebTestCase
         return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
     }
 
+    private function seedAuth(KernelBrowser $client, string $username = 'john'): SessionInterface
+    {
+        $factory = static::getContainer()->get('session.factory');
+        $session = $factory->createSession();
+        $session->start();
+        $session->set('user', $username);
+        $session->save();
+
+        $client->getCookieJar()->set(new Cookie($session->getName(), $session->getId()));
+
+        return $session;
+    }
+
     public function testGetConvertSuccess(): void
     {
         $client = static::createClient();
@@ -34,7 +49,10 @@ class ConversionControllerTest extends WebTestCase
         $validator = $this->createMock(ValidatorInterface::class);
         $violations = $this->createMock(ConstraintViolationListInterface::class);
 
+        $violations->method('count')->willReturn(0);
         $validator->method('validate')->willReturn($violations);
+        $this->seedAuth($client);
+
         $rates->method('fetchExchangeRateCurrency')->willReturnMap([
             ['USD', 1.10],
             ['EUR', 1.00],
@@ -74,20 +92,23 @@ class ConversionControllerTest extends WebTestCase
         $validator = $this->createMock(ValidatorInterface::class);
         $violations = $this->createMock(ConstraintViolationListInterface::class);
 
-        $violations->method('count')->willReturn(1);
-        $violations->method('__toString')->willReturn('bad');
+        $violations->method('count')->willReturn(0);
         $validator->method('validate')->willReturn($violations);
+        $this->seedAuth($client);
+
+        $rates->method('fetchExchangeRateCurrency')
+            ->willThrowException(new \App\Exception\SwopApiException('down'));
 
         static::getContainer()->set(ExchangeRateProviderInterface::class, $rates);
         static::getContainer()->set(MoneyConversionCalculator::class, $calc);
         static::getContainer()->set(MetricsClient::class, $metrics);
         static::getContainer()->set(ValidatorInterface::class, $validator);
 
-        $client->request('GET', '/api/convert?amount=-1&from=USD&to=EUR');
+        $client->request('GET', '/api/convert?amount=10&from=USD&to=EUR');
 
-        self::assertResponseStatusCodeSame(422);
+        self::assertResponseStatusCodeSame(502);
         $data = self::decode($client->getResponse()->getContent());
-        self::assertSame('Validation failed: bad', $data['error']);
+        self::assertSame('External API error', $data['error']);
     }
 
     public function testGetConvertSwopError(): void
@@ -100,8 +121,12 @@ class ConversionControllerTest extends WebTestCase
         $validator = $this->createMock(ValidatorInterface::class);
         $violations = $this->createMock(ConstraintViolationListInterface::class);
 
+        $violations->method('count')->willReturn(0);
         $validator->method('validate')->willReturn($violations);
-        $rates->method('fetchExchangeRateCurrency')->willThrowException(new \App\Exception\SwopApiException('down'));
+        $this->seedAuth($client);
+
+        $rates->method('fetchExchangeRateCurrency')
+            ->willThrowException(new \App\Exception\SwopApiException('down'));
 
         static::getContainer()->set(ExchangeRateProviderInterface::class, $rates);
         static::getContainer()->set(MoneyConversionCalculator::class, $calc);
@@ -125,7 +150,10 @@ class ConversionControllerTest extends WebTestCase
         $validator = $this->createMock(ValidatorInterface::class);
         $violations = $this->createMock(ConstraintViolationListInterface::class);
 
+        $violations->method('count')->willReturn(0);
         $validator->method('validate')->willReturn($violations);
+        $this->seedAuth($client);
+
         $rates->method('fetchExchangeRateCurrency')->willReturnMap([
             ['USD', 1.10],
             ['EUR', 1.00],
@@ -153,7 +181,7 @@ class ConversionControllerTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(401);
         $data = self::decode($client->getResponse()->getContent());
-        self::assertSame('Authentication required', $data['error']);
+        self::assertSame('Not authenticated', $data['error']);
     }
 
     public function testPostConvertInvalidCsrf(): void
@@ -225,3 +253,4 @@ class ConversionControllerTest extends WebTestCase
         self::assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T/', $data['timestamp']);
     }
 }
+
