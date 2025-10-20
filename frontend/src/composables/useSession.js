@@ -1,13 +1,9 @@
-// frontend/src/composables/useSession.js
 import { ref } from 'vue'
 
 const user = ref(null)
 const loading = ref(false)
 const error = ref(null)
 
-/**
- * Safely parses JSON or throws a human-readable error
- */
 async function parseJsonSafe(res) {
     const ct = res.headers.get('content-type') || ''
     if (!ct.includes('application/json')) {
@@ -22,9 +18,6 @@ async function parseJsonSafe(res) {
     }
 }
 
-/**
- * Generic API helper that handles credentials and JSON parsing safely
- */
 async function API(path, opts = {}) {
     const res = await fetch(`${import.meta.env.VITE_API_BASE || ''}${path}`, {
         credentials: 'include',
@@ -50,6 +43,10 @@ export function useSession() {
         else localStorage.removeItem('ccs.user')
     }
 
+    function forceLogout() {
+        setUser(null)
+    }
+
     async function refresh() {
         loading.value = true
         error.value = null
@@ -59,10 +56,10 @@ export function useSession() {
             if (data.authenticated && data.user) {
                 setUser(data.user)
             } else {
-                const cached = localStorage.getItem('ccs.user')
-                if (cached) setUser(cached)
+                setUser(null)
             }
         } catch (e) {
+            setUser(null)
             error.value = e
         } finally {
             loading.value = false
@@ -102,7 +99,7 @@ export function useSession() {
                 method: 'POST',
                 headers: { 'X-CSRF-Token': token },
             })
-            user.value = null
+            setUser(null)
         } catch (e) {
             error.value = e
         } finally {
@@ -110,5 +107,5 @@ export function useSession() {
         }
     }
 
-    return { user, loading, error, refresh, login, logout, getCsrf }
+    return { user, loading, error, refresh, login, logout, getCsrf, forceLogout }
 }

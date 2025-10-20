@@ -8,6 +8,7 @@ use App\Dto\ErrorResponse;
 use App\Exception\ConversionException;
 use App\Exception\SwopApiException;
 use App\Service\ConversionService;
+use App\Service\SessionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,12 +23,17 @@ final class ConversionController extends AbstractController
 {
     public function __construct(
         private ConversionService $service,
+        private SessionService $sessions,
         private CsrfTokenManagerInterface $csrf,
     ) {}
 
     #[Route('/convert', name: 'convert_get', methods: ['GET'])]
-    public function getConvert(Request $req): JsonResponse
+    public function getConvert(Request $req, SessionInterface $session): JsonResponse
     {
+        if (!$this->sessions->getUser($session)) {
+            return $this->json(new ErrorResponse('Not authenticated'), 401);
+        }
+
         try {
             $dto = ConversionRequest::fromArray($req->query->all());
             $result = $this->service->convertRates($dto, $req->headers->get('Accept-Language') ?? 'en-US');
@@ -44,6 +50,10 @@ final class ConversionController extends AbstractController
     #[Route('/convert', name: 'convert_post', methods: ['POST'])]
     public function postConvert(Request $req, SessionInterface $session): JsonResponse
     {
+        if (!$this->sessions->getUser($session)) {
+            return $this->json(new ErrorResponse('Not authenticated'), 401);
+        }
+
         $user = $session->get('user');
         if (!is_string($user) || $user === '') {
             return $this->json(new ErrorResponse('Authentication required'), 401);
@@ -56,7 +66,7 @@ final class ConversionController extends AbstractController
 
         $json = json_decode($req->getContent() ?: '{}', true) ?: [];
         $proxy = new Request(query: $json);
-        return $this->getConvert($proxy);
+        return $this->getConvert($proxy, $session);
     }
 
     private function csrfFromHeaders(Request $request): ?string

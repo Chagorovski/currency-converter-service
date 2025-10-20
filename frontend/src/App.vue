@@ -5,19 +5,16 @@ import { useCurrencies } from './composables/useCurrencies'
 import { useConversion } from './composables/useConversion'
 import { useSession } from './composables/useSession'
 import ConverterForm from './components/ConverterForm.vue'
-import LoginCard from './components/LoginCard.vue' // ← add this
+import LoginCard from './components/LoginCard.vue'
 
 const { t } = useI18n()
 const { codes } = useCurrencies()
 
-// Session
 const { user, loading: loadingSession, error: sessionError, refresh, login, logout, getCsrf } = useSession()
 onMounted(refresh)
 
-// Conversion
 const { output, error: convertError, loading: converting, convert } = useConversion(getCsrf)
 
-// Called when LoginCard emits "login" with the name
 function handleLogin(name) {
   if (!name) return
   login(name)
@@ -33,14 +30,12 @@ function onSubmit(payload) {
 </script>
 
 <template>
-  <!-- Hero -->
   <header class="hero">
     <h1>Currency Converter</h1>
     <p v-if="user">Welcome, {{ user }}!</p>
     <p v-else>Check live foreign exchange rates</p>
   </header>
 
-  <!-- Card -->
   <section class="container">
     <div class="card">
       <LoginCard

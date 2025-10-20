@@ -7,6 +7,7 @@ export function useConversion(getCsrf = null) {
     const output = ref(null)
     const error = ref(null)
     const loading = ref(false)
+    const { forceLogout } = useSession()
 
     const { user, logout } = useSession()
 
@@ -48,20 +49,13 @@ export function useConversion(getCsrf = null) {
             if (res?.error) throw new ApiError(res.error, { details: res.details })
             output.value = res
         } catch (e) {
-            const msg = (e && (e.message || '')).toString()
-            const status = e && (e.status || e.code || e?.info?.status)
-
-            if (status === 401 || /authentication required/i.test(msg)) {
-                try {
-                    await logout()
-                } finally {
-                    output.value = null
-                    error.value = null
-                }
+            const status = (e instanceof ApiError && (e.status ?? e?.details?.status)) || null
+            if (status === 401 || status === 403) {
+                forceLogout()
+                error.value = 'Your session expired. Please sign in again.'
                 return
             }
-
-            error.value = e
+            error.value = e.message || 'Conversion failed'
         } finally {
             loading.value = false
         }
