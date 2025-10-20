@@ -20,7 +20,7 @@ framework:
 
   session:
     handler_id: null
+    save_path: '%env(REDIS_URL)%'
     cookie_secure: auto
     cookie_samesite: lax
     cookie_httponly: true
-    save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
