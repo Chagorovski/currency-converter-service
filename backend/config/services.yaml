@@ -23,7 +23,7 @@ services:
       - '%env(REDIS_URL)%'
 
   app.session.handler.redis:
-    class: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler'
+    class: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
     arguments:
       - '@app.redis.connection'
       - { prefix: 'sess_', ttl: 0 }
