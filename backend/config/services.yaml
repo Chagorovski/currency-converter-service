@@ -16,18 +16,6 @@ services:
     tags: ['controller.service_arguments']
     public: true
 
-  app.redis.connection:
-    class: Redis
-    factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
-    arguments:
-      - '%env(REDIS_URL)%?lazy=1'
-
-  app.session.handler.redis:
-    class: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
-    arguments:
-      - '@app.redis.connection'
-      - { prefix: 'sess_', ttl: 0 }
-
   app.redis_adapter:
     alias: 'cache.app'
 
